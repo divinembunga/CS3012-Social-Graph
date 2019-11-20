@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 
-fetch('https://api.github.com/users/divinembunga/followers')
+/*fetch('https://api.github.com/users/divinembunga/followers')
     .then(response => {
         return response.json()
     })
@@ -17,7 +17,23 @@ fetch('https://api.github.com/users/divinembunga/followers')
     })
     .catch(err => {
         // Do something for an error here
-    })
+    })*/
+const api_url = 'https://api.github.com/users/divinembunga/followers';
+async function getFollowers(){
+    const response = await fetch(api_url);
+    const data = await response.json();
+    var i;
+    var count=0;
+    for(i=0; i< data.length;i++){
+        const{login, followers_url} = data[i];
+        count++;
+        //document.getElementById('l').textContent = login;
+        document.getElementById('f').textContent = followers_url;
+    }
+    document.getElementById("count").innerHTML= count;
+}
+
+getFollowers();
 class Main extends Component {
 
     render() {
@@ -25,7 +41,8 @@ class Main extends Component {
             <div>
                 <h1>Social Graph</h1>
                 <p>
-                    login: <span id ="l"></span>
+                    Number of followers:<span id="count"></span>
+
                 </p>
                 <p>
                     follower: <span id ="f"></span>
