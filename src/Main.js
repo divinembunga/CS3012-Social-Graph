@@ -1,259 +1,81 @@
 import React, { Component } from "react";
 import * as d3 from "d3";
-//import {drag} from "d3";
-//import {JSONSchema7 as invalidation} from "json-schema";
-//import {color} from "d3";
+import {drag} from "d3";
 class Main extends Component {
-    /*componentDidMount() {
-        this.drawChart();
-    }*/
-
     componentDidMount() {
-        this.drawChart()
-    }
-
-    componentDidUpdate() {
-        this.drawChart()
+        this.drawChart();
     }
 
     drawChart() {
-        var data = {
-            "nodes": [
-                {"id": "Myriel", "group": 1},
-                {"id": "Napoleon", "group": 1},
-                {"id": "Mlle.Baptistine", "group": 1},
-                {"id": "Mme.Magloire", "group": 1},
-                {"id": "CountessdeLo", "group": 1},
-                {"id": "Geborand", "group": 1},
-                {"id": "Champtercier", "group": 1},
-                {"id": "Cravatte", "group": 1},
-                {"id": "Count", "group": 1},
-                {"id": "OldMan", "group": 1},
-                {"id": "Labarre", "group": 2},
-                {"id": "Valjean", "group": 2}
-            ],
-            "links": [
-                {"source": "Napoleon", "target": "Myriel", "value": 1},
-                {"source": "Mlle.Baptistine", "target": "Myriel", "value": 8},
-                {"source": "Mme.Magloire", "target": "Myriel", "value": 10},
-                {"source": "Mme.Magloire", "target": "Mlle.Baptistine", "value": 6},
-                {"source": "CountessdeLo", "target": "Myriel", "value": 1},
-                {"source": "Geborand", "target": "Myriel", "value": 1},
-                {"source": "Champtercier", "target": "Myriel", "value": 1},
-                {"source": "Cravatte", "target": "Myriel", "value": 1},
-                {"source": "Count", "target": "Myriel", "value": 2},
-                {"source": "OldMan", "target": "Myriel", "value": 1},
-                {"source": "Valjean", "target": "Labarre", "value": 1},
-                {"source": "Valjean", "target": "Mme.Magloire", "value": 3},
-                {"source": "Valjean", "target": "Mlle.Baptistine", "value": 3},
-                {"source": "Valjean", "target": "Myriel", "value": 5}
-            ]
-        }
+        const data = [12, 5, 6, 6, 9, 10];
+        const margin =60;
+        const width =1000 - 2 * margin;
+        const height = 600 - 2 * margin;
 
-        console.log(data);
+        const svg = d3.select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .style("margin-left", margin);
 
-        var width = 800;
-        var height = 600;
-        var color = d3.scaleOrdinal(d3.schemeCategory10);
-
-        d3.json("data.json").then(function (graph) {
-
-            var label = {
-                'nodes': [],
-                'links': []
-            };
-
-            graph.nodes.forEach(function (d, i) {
-                label.nodes.push({node: d});
-                label.nodes.push({node: d});
-                label.links.push({
-                    source: i * 2,
-                    target: i * 2 + 1
-                });
-            });
-
-            var labelLayout = d3.forceSimulation(label.nodes)
-                .force("charge", d3.forceManyBody().strength(-50))
-                .force("link", d3.forceLink(label.links).distance(0).strength(2));
-
-            var graphLayout = d3.forceSimulation(graph.nodes)
-                .force("charge", d3.forceManyBody().strength(-3000))
-                .force("center", d3.forceCenter(width / 2, height / 2))
-                .force("x", d3.forceX(width / 2).strength(1))
-                .force("y", d3.forceY(height / 2).strength(1))
-                .force("link", d3.forceLink(graph.links).id(function (d) {
-                    return d.id;
-                }).distance(50).strength(1))
-                .on("tick", ticked);
-
-            var adjlist = [];
-
-            graph.links.forEach(function (d) {
-                adjlist[d.source.index + "-" + d.target.index] = true;
-                adjlist[d.target.index + "-" + d.source.index] = true;
-            });
-
-            function neigh(a, b) {
-                return a === b || adjlist[a + "-" + b];
-            }
+        const  chart = svg.append('g')
+            .attr('transform', `translate(${margin}, ${margin})`);
 
 
-            var svg = d3.select("#viz").attr("width", width).attr("height", height);
-            var container = svg.append("g");
+        svg.selectAll("rect")
+            .data(data)
+            .enter()
+            .append("rect")
+            .attr("x", (d, i) => i * 70)
+            .attr("y", (d, i) => height - 10 * d)
+            .attr("width", 65)
+            .attr("height", (d, i) => d * 10)
+            .attr("fill", "green")
 
-            svg.call(
-                d3.zoom()
-                    .scaleExtent([.1, 4])
-                    .on("zoom", function () {
-                        container.attr("transform", d3.event.transform);
-                    })
-            );
 
-            var link = container.append("g").attr("class", "links")
-                .selectAll("line")
-                .data(graph.links)
-                .enter()
-                .append("line")
-                .attr("stroke", "#aaa")
-                .attr("stroke-width", "1px");
+        const yScale = d3.scaleLinear()
+            .range([height, 0])
+            .domain([0, 100]);
 
-            var node = container.append("g").attr("class", "nodes")
-                .selectAll("g")
-                .data(graph.nodes)
-                .enter()
-                .append("circle")
-                .attr("r", 5)
-                .attr("fill", function (d) {
-                    return color(d.group);
-                })
+        chart.append('g')
+            .call(d3.axisLeft(yScale));
 
-            node.on("mouseover", focus).on("mouseout", unfocus);
+        const xScale = d3.scaleBand()
+            .range([0, width])
+            .domain(d3.map((s) => s.language))
+            //would be part of the object where there is a name of the x scale
+            //.domain([1,2,3,4,5])
+            .padding(0.2);
 
-            node.call(
-                d3.drag()
-                    .on("start", dragstarted)
-                    .on("drag", dragged)
-                    .on("end", dragended)
-            );
+        chart.append('g')
+            .attr('transform', `translate(0, ${height})`)
+            .call(d3.axisBottom(xScale));
 
-            var labelNode = container.append("g").attr("class", "labelNodes")
-                .selectAll("text")
-                .data(label.nodes)
-                .enter()
-                .append("text")
-                .text(function (d, i) {
-                    return i % 2 === 0 ? "" : d.node.id;
-                })
-                .style("fill", "#555")
-                .style("font-family", "Arial")
-                .style("font-size", 12)
-                .style("pointer-events", "none"); // to prevent mouseover/drag capture
+        const makeYLines = () => d3.axisLeft()
+            .scale(yScale)
 
-            node.on("mouseover", focus).on("mouseout", unfocus);
+        chart.append('g')
+            .attr('class', 'grid')
+            .call(makeYLines()
+                .tickSize(-width, 0, 0)
+                .tickFormat('')
+            )
 
-            function ticked() {
+        chart.append('g')
+            .attr('class', 'grid')
+            .call(d3.axisLeft()
+                .scale(yScale)
+                .tickSize(60, 0, 0)
+                .tickFormat(''))
 
-                node.call(updateNode);
-                link.call(updateLink);
 
-                labelLayout.alphaTarget(0.3).restart();
-                labelNode.each(function (d, i) {
-                    if (i % 2 === 0) {
-                        d.x = d.node.x;
-                        d.y = d.node.y;
-                    } else {
-                        var b = this.getBBox();
-
-                        var diffX = d.x - d.node.x;
-                        var diffY = d.y - d.node.y;
-
-                        var dist = Math.sqrt(diffX * diffX + diffY * diffY);
-
-                        var shiftX = b.width * (diffX - dist) / (dist * 2);
-                        shiftX = Math.max(-b.width, Math.min(0, shiftX));
-                        var shiftY = 16;
-                        this.setAttribute("transform", "translate(" + shiftX + "," + shiftY + ")");
-                    }
-                });
-                labelNode.call(updateNode);
-
-            }
-
-            function fixna(x) {
-                if (isFinite(x)) return x;
-                return 0;
-            }
-
-            function focus(d) {
-                var index = d3.select(d3.event.target).datum().index;
-                node.style("opacity", function (o) {
-                    return neigh(index, o.index) ? 1 : 0.1;
-                });
-                labelNode.attr("display", function (o) {
-                    return neigh(index, o.node.index) ? "block" : "none";
-                });
-                link.style("opacity", function (o) {
-                    return o.source.index === index || o.target.index === index ? 1 : 0.1;
-                });
-            }
-
-            function unfocus() {
-                labelNode.attr("display", "block");
-                node.style("opacity", 1);
-                link.style("opacity", 1);
-            }
-
-            function updateLink(link) {
-                link.attr("x1", function (d) {
-                    return fixna(d.source.x);
-                })
-                    .attr("y1", function (d) {
-                        return fixna(d.source.y);
-                    })
-                    .attr("x2", function (d) {
-                        return fixna(d.target.x);
-                    })
-                    .attr("y2", function (d) {
-                        return fixna(d.target.y);
-                    });
-            }
-
-            function updateNode(node) {
-                node.attr("transform", function (d) {
-                    return "translate(" + fixna(d.x) + "," + fixna(d.y) + ")";
-                });
-            }
-
-            function dragstarted(d) {
-                d3.event.sourceEvent.stopPropagation();
-                if (!d3.event.active) graphLayout.alphaTarget(0.3).restart();
-                d.fx = d.x;
-                d.fy = d.y;
-            }
-
-            function dragged(d) {
-                d.fx = d3.event.x;
-                d.fy = d3.event.y;
-            }
-
-            function dragended(d) {
-                if (!d3.event.active) graphLayout.alphaTarget(0);
-                d.fx = null;
-                d.fy = null;
-            }
-
-        }); // d3.json
-    }
-
-    render() {
-        return <div>
-            <h1>Hello</h1>
-        </div>
     }
 
 
 
-
+    render(){
+        return <div id={"#" + this.props.id}></div>
+    }
 }
 
-export default Main
+export default Main;
