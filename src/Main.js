@@ -1,246 +1,259 @@
 import React, { Component } from "react";
 import * as d3 from "d3";
-import {drag} from "d3";
-import {JSONSchema7 as invalidation} from "json-schema";
-
-
-
-/*fetch('https://api.github.com/users/divinembunga/followers')
-    .then(response => {
-        return response.json()
-    })
-    .then(data => {
-        // Work with JSON data here
-        // var myObj = JSON.parse(this.data);
-        // document.getElementById("demo").innerHTML = myObj[1];
-        console.log(data)
-        const{login, followers_url} = data[1];
-        document.getElementById('l').textContent = login;
-        document.getElementById('f').textContent = followers_url;
-        //user_profile.social_media[1].description
-    })
-    .catch(err => {
-        // Do something for an error here
-    })*/
-
-//var userQueue= ["divinembunga"];
-var mainUser ={
-    login: 'divinembunga',
-    followers: [],
-};
-
-var followerQueue=[mainUser];
-var numberOfFollowers = 0;
-const MAX_FOLLOWERS =12;
-const NEW_USER = -1;
-const DEFAULT = 1;
-
-//hard coding my gitHub username into the code
-
- var userPosition =0;
- getFollowers(mainUser);
-drawGraph();
-//migt have to append the username to the url or before you
-//call that function again you change that url since it is a variable
-//might need to change it as a variable then
-//var api_url = 'https://api.github.com/users/divinembunga/followers';
-async function getFollowers(user){
-    var api_url = 'https://api.github.com/'+user.login+'/followers';
-    const response = await fetch(api_url);
-    const data = await response.json();
-    var i;
-    var count=0;
-    for(i=0; i< data.length;i++){
-        const{login, followers_url} = data[i];
-        count++;
-        var follower ={
-            login: data[i].login,
-            followers: [],
-        };
-        if(userPosition ==0){
-            followerQueue.push(follower);
-            getFollowersOfFollower();
-            numberOfFollowers++;
-        }
-        if((isNewFollower(follower.login,user.followers) && follower.login != user.login)){
-            user.followers.push(follower);
-        }
-        //followerQueue.push(login);
-        //document.getElementById('l').textContent = login;
-        document.getElementById('f').textContent = followers_url;
-    }
-    userPosition =1;
-   // document.getElementById("count").innerHTML= count;
-}
-
-function isNewFollower(username,followers){
-    for(var i =0; i<followers.length; i++){
-        if(username === followers[i].login){
-            return false;
-        }
-    }
-    return true;
-}
-
-function getFollowersOfFollower(){
-    while(numberOfFollowers < MAX_FOLLOWERS)
-    {
-        var user = followerQueue.shift();
-        numberOfFollowers++;
-        //api_url ="https://api.github.com/users/"+user.login+"/followers";
-        getFollowers(user);
-    }
-}
-
-function followersToD3(d3, mainUser, source) {
-
-    var target = getTarget(d3, mainUser);
-
-    if (target == NEW_USER) {
-
-        var node = {
-            name: mainUser.username,
-            group: DEFAULT
-        }
-        d3.nodes.push(node);
-        target = d3.nodes.length - 1;
-
-        var link = {
-            source: source,
-            target: target,
-            value: DEFAULT
-        }
-        d3.links.push(link);
-
-    }
-    var i;
-    var size = mainUser.followers;
-    for (i = 0; i < size.length && i < MAX_FOLLOWERS; i++)
-        followersToD3(d3, mainUser.followers[i], target);
-    }
-
-    function getTarget(d3, mainUser) {
-        for (var i = 0; i < d3.nodes.length; i++)
-            if (d3.nodes[i].name == mainUser.username)
-                return i;
-        return NEW_USER;
-    }
-
-
-    function drawGraph() {
-        var graph = '<br><br><br><br><br><h3 style="color:#5cb85c;">Your contributor social graph</h3><p>Contributors of contributors of your repos<br><br>';
-        graph += '<svg id="graph" width="' + screen.availWidth + '" height="650px"></svg>';
-        ("#display").html(graph);
-        var d3 = {
-            nodes: [{
-                name: mainUser.username,
-                group: DEFAULT
-            }],
-            links: []
-        }
-        followersToD3(d3, mainUser, 0);
-        socialGraph(d3);
-    }
-
-    function socialGraph(data) {
-
-        const links = data.links.map(d => Object.create(d));
-        const nodes = data.nodes.map(d => Object.create(d));
-
-        const simulation = d3.forceSimulation(nodes)
-            .force("link", d3.forceLink(links).id(d => d.id))
-            .force("charge", d3.forceManyBody())
-            .force("center", d3.forceCenter(100 / 2, 100 / 2));
-
-        const svg = d3.create("svg")
-            .attr("viewBox", [0, 0, 100, 100]);
-
-        const link = svg.append("g")
-            .attr("stroke", "#999")
-            .attr("stroke-opacity", 0.6)
-            .selectAll("line")
-            .data(links)
-            .join("line")
-            .attr("stroke-width", d => Math.sqrt(d.value));
-
-        const node = svg.append("g")
-            .attr("stroke", "#fff")
-            .attr("stroke-width", 1.5)
-            .selectAll("circle")
-            .data(nodes)
-            .join("circle")
-            .attr("r", 5)
-            .attr("fill", "#5F9EA0")
-            .call(drag(simulation));
-
-        node.append("title")
-            .text(d => d.id);
-
-        simulation.on("tick", () => {
-            link
-                .attr("x1", d => d.source.x)
-                .attr("y1", d => d.source.y)
-                .attr("x2", d => d.target.x)
-                .attr("y2", d => d.target.y);
-
-            node
-                .attr("cx", d => d.x)
-                .attr("cy", d => d.y);
-        });
-
-        //invalidation.then(() => simulation.stop());
-
-        return svg.node();
-
-
-        const scale = d3.scaleOrdinal(d3.schemeCategory10);
-        return d => scale(d.group);
-
-
-        function dragstarted(d) {
-            if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-            d.fx = d.x;
-            d.fy = d.y;
-        }
-
-        function dragged(d) {
-            d.fx = d3.event.x;
-            d.fy = d3.event.y;
-        }
-
-        function dragended(d) {
-            if (!d3.event.active) simulation.alphaTarget(0);
-            d.fx = null;
-            d.fy = null;
-        }
-
-        return d3.drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended);
-
-
-    }
-
-
+//import {drag} from "d3";
+//import {JSONSchema7 as invalidation} from "json-schema";
+//import {color} from "d3";
 class Main extends Component {
-    render() {
-        return (
-            <div>
-                <h1>Network Graph</h1>
-                <div id ="graph">
+    /*componentDidMount() {
+        this.drawChart();
+    }*/
 
-                </div>
-
-
-            </div>
-
-        );
+    componentDidMount() {
+        this.drawChart()
     }
+
+    componentDidUpdate() {
+        this.drawChart()
+    }
+
+    drawChart() {
+        var data = {
+            "nodes": [
+                {"id": "Myriel", "group": 1},
+                {"id": "Napoleon", "group": 1},
+                {"id": "Mlle.Baptistine", "group": 1},
+                {"id": "Mme.Magloire", "group": 1},
+                {"id": "CountessdeLo", "group": 1},
+                {"id": "Geborand", "group": 1},
+                {"id": "Champtercier", "group": 1},
+                {"id": "Cravatte", "group": 1},
+                {"id": "Count", "group": 1},
+                {"id": "OldMan", "group": 1},
+                {"id": "Labarre", "group": 2},
+                {"id": "Valjean", "group": 2}
+            ],
+            "links": [
+                {"source": "Napoleon", "target": "Myriel", "value": 1},
+                {"source": "Mlle.Baptistine", "target": "Myriel", "value": 8},
+                {"source": "Mme.Magloire", "target": "Myriel", "value": 10},
+                {"source": "Mme.Magloire", "target": "Mlle.Baptistine", "value": 6},
+                {"source": "CountessdeLo", "target": "Myriel", "value": 1},
+                {"source": "Geborand", "target": "Myriel", "value": 1},
+                {"source": "Champtercier", "target": "Myriel", "value": 1},
+                {"source": "Cravatte", "target": "Myriel", "value": 1},
+                {"source": "Count", "target": "Myriel", "value": 2},
+                {"source": "OldMan", "target": "Myriel", "value": 1},
+                {"source": "Valjean", "target": "Labarre", "value": 1},
+                {"source": "Valjean", "target": "Mme.Magloire", "value": 3},
+                {"source": "Valjean", "target": "Mlle.Baptistine", "value": 3},
+                {"source": "Valjean", "target": "Myriel", "value": 5}
+            ]
+        }
+
+        console.log(data);
+
+        var width = 800;
+        var height = 600;
+        var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+        d3.json("data.json").then(function (graph) {
+
+            var label = {
+                'nodes': [],
+                'links': []
+            };
+
+            graph.nodes.forEach(function (d, i) {
+                label.nodes.push({node: d});
+                label.nodes.push({node: d});
+                label.links.push({
+                    source: i * 2,
+                    target: i * 2 + 1
+                });
+            });
+
+            var labelLayout = d3.forceSimulation(label.nodes)
+                .force("charge", d3.forceManyBody().strength(-50))
+                .force("link", d3.forceLink(label.links).distance(0).strength(2));
+
+            var graphLayout = d3.forceSimulation(graph.nodes)
+                .force("charge", d3.forceManyBody().strength(-3000))
+                .force("center", d3.forceCenter(width / 2, height / 2))
+                .force("x", d3.forceX(width / 2).strength(1))
+                .force("y", d3.forceY(height / 2).strength(1))
+                .force("link", d3.forceLink(graph.links).id(function (d) {
+                    return d.id;
+                }).distance(50).strength(1))
+                .on("tick", ticked);
+
+            var adjlist = [];
+
+            graph.links.forEach(function (d) {
+                adjlist[d.source.index + "-" + d.target.index] = true;
+                adjlist[d.target.index + "-" + d.source.index] = true;
+            });
+
+            function neigh(a, b) {
+                return a === b || adjlist[a + "-" + b];
+            }
+
+
+            var svg = d3.select("#viz").attr("width", width).attr("height", height);
+            var container = svg.append("g");
+
+            svg.call(
+                d3.zoom()
+                    .scaleExtent([.1, 4])
+                    .on("zoom", function () {
+                        container.attr("transform", d3.event.transform);
+                    })
+            );
+
+            var link = container.append("g").attr("class", "links")
+                .selectAll("line")
+                .data(graph.links)
+                .enter()
+                .append("line")
+                .attr("stroke", "#aaa")
+                .attr("stroke-width", "1px");
+
+            var node = container.append("g").attr("class", "nodes")
+                .selectAll("g")
+                .data(graph.nodes)
+                .enter()
+                .append("circle")
+                .attr("r", 5)
+                .attr("fill", function (d) {
+                    return color(d.group);
+                })
+
+            node.on("mouseover", focus).on("mouseout", unfocus);
+
+            node.call(
+                d3.drag()
+                    .on("start", dragstarted)
+                    .on("drag", dragged)
+                    .on("end", dragended)
+            );
+
+            var labelNode = container.append("g").attr("class", "labelNodes")
+                .selectAll("text")
+                .data(label.nodes)
+                .enter()
+                .append("text")
+                .text(function (d, i) {
+                    return i % 2 === 0 ? "" : d.node.id;
+                })
+                .style("fill", "#555")
+                .style("font-family", "Arial")
+                .style("font-size", 12)
+                .style("pointer-events", "none"); // to prevent mouseover/drag capture
+
+            node.on("mouseover", focus).on("mouseout", unfocus);
+
+            function ticked() {
+
+                node.call(updateNode);
+                link.call(updateLink);
+
+                labelLayout.alphaTarget(0.3).restart();
+                labelNode.each(function (d, i) {
+                    if (i % 2 === 0) {
+                        d.x = d.node.x;
+                        d.y = d.node.y;
+                    } else {
+                        var b = this.getBBox();
+
+                        var diffX = d.x - d.node.x;
+                        var diffY = d.y - d.node.y;
+
+                        var dist = Math.sqrt(diffX * diffX + diffY * diffY);
+
+                        var shiftX = b.width * (diffX - dist) / (dist * 2);
+                        shiftX = Math.max(-b.width, Math.min(0, shiftX));
+                        var shiftY = 16;
+                        this.setAttribute("transform", "translate(" + shiftX + "," + shiftY + ")");
+                    }
+                });
+                labelNode.call(updateNode);
+
+            }
+
+            function fixna(x) {
+                if (isFinite(x)) return x;
+                return 0;
+            }
+
+            function focus(d) {
+                var index = d3.select(d3.event.target).datum().index;
+                node.style("opacity", function (o) {
+                    return neigh(index, o.index) ? 1 : 0.1;
+                });
+                labelNode.attr("display", function (o) {
+                    return neigh(index, o.node.index) ? "block" : "none";
+                });
+                link.style("opacity", function (o) {
+                    return o.source.index === index || o.target.index === index ? 1 : 0.1;
+                });
+            }
+
+            function unfocus() {
+                labelNode.attr("display", "block");
+                node.style("opacity", 1);
+                link.style("opacity", 1);
+            }
+
+            function updateLink(link) {
+                link.attr("x1", function (d) {
+                    return fixna(d.source.x);
+                })
+                    .attr("y1", function (d) {
+                        return fixna(d.source.y);
+                    })
+                    .attr("x2", function (d) {
+                        return fixna(d.target.x);
+                    })
+                    .attr("y2", function (d) {
+                        return fixna(d.target.y);
+                    });
+            }
+
+            function updateNode(node) {
+                node.attr("transform", function (d) {
+                    return "translate(" + fixna(d.x) + "," + fixna(d.y) + ")";
+                });
+            }
+
+            function dragstarted(d) {
+                d3.event.sourceEvent.stopPropagation();
+                if (!d3.event.active) graphLayout.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+
+            function dragged(d) {
+                d.fx = d3.event.x;
+                d.fy = d3.event.y;
+            }
+
+            function dragended(d) {
+                if (!d3.event.active) graphLayout.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+            }
+
+        }); // d3.json
+    }
+
+    render() {
+        return <div>
+            <h1>Hello</h1>
+        </div>
+    }
+
+
+
+
 }
 
-export default Main;
-
-
-
-
+export default Main
