@@ -3,11 +3,10 @@ body {
   font-family: 'Open Sans', sans-serif;
 }
 
-div#layout {
+body{
   text-align: center;
 }
-
-div#container {
+body{
   width: 1000px;
   height: 600px;
   margin: auto;
