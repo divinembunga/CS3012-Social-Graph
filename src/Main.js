@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import * as d3 from "d3";
 import {drag} from "d3";
-
+var flang=[];
 var languages =[];
 async function getRepos() {
     var api_url = 'https://api.github.com/users/divinembunga/repos';
@@ -15,7 +15,53 @@ async function getRepos() {
             //languages[i]=(data[i].language);
         }
     }
+    //console.log(languages)
+    getFollowersRepos();
+
+}
+
+async function getFollowersRepos() {
+    var isSame =0;
+    var username;
+    var api_url = 'https://api.github.com/users/divinembunga/followers';
+    const response = await fetch(api_url);
+    const data = await response.json();
+    //console.log(data[0].language);
+    for(var k=0; k<data.length;k++) {
+        username = data[k].login;
+        var fapi_url = 'https://api.github.com/users/' + username + '/repos';
+        const fresponse = await fetch(fapi_url);
+        const fdata = await fresponse.json();
+        for (var l = 0; l < fdata.length; l++) {
+            if (fdata[l].language !== null) {
+                languages.push(fdata[l].language);
+            }
+                /*Tried looping through the array
+                languages to check if the language had
+                already been placed in the array
+                but there was a weird bug that would allow
+                the comparison of the strings in the
+                array when it reached the length of 6
+                for(var m=0; m<languages.length;m++){
+                    console.log(languages.length);
+                    if(fdata[l].language===languages[m]){
+                        isSame=1;
+                        //languages[m]=fdata[l].language;
+                        //console.log(fdata[l].language);
+                    }
+
+                }
+                if(isSame === 0){
+                    //console.log("push");
+                    languages.push(fdata[l].language);
+                }
+                //languages.push(fdata[l].language);
+                //languages[i]=(data[i].language);
+            }*/
+        }
+    }
     console.log(languages);
+    console.log(flang);
 
 }
 
