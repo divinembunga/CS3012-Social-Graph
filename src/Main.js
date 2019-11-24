@@ -1,7 +1,107 @@
 import React, { Component } from "react";
 import * as d3 from "d3";
 import {drag} from "d3";
-var flang=[];
+
+//hardcoding the language names due to the bug
+const codingLang = [
+    {
+        language: 'JavaScript',
+        value: 0
+
+    },
+    {
+        language: 'Java',
+        value: 0
+
+    },
+    {
+        language: 'C',
+        value: 0
+
+    },
+    {
+        language: 'C++',
+        value: 0
+
+    },
+    {
+        language: 'Processing',
+        value: 0
+    },
+    {
+        language: 'TypeScript',
+        value: 0
+    },
+    {
+        language: 'Python',
+        value: 0
+    },
+    {
+        language: 'Lua',
+        value: 0
+    },
+    {
+        language: 'HTML',
+        value: 0
+    },
+    {
+        language: 'CSS',
+        value: 0
+    },
+    {
+        language: 'PHP',
+        value: 0
+    },
+    {
+        language: 'Vue',
+        value: 0
+    },
+    {
+        language: 'Batchfile',
+        value: 0
+    },
+    {
+        language: 'Go',
+        value: 0
+    },
+    {
+        language: 'Assembly',
+        value: 0
+    },
+    {
+        language: 'MATLAB',
+        value: 0
+    },
+    {
+        language: 'TeX',
+        value: 0
+    },
+    {
+        language: 'VDHL',
+        value: 0
+    },
+    {
+        language: 'Prolog',
+        value: 0,
+        color: '#fbcb39'
+    },
+    {
+        language: 'C#',
+        value: 0
+    },
+    {
+        language: 'Haskell',
+        value: 0
+    },
+    {
+        language: 'Shell',
+        value: 0
+    },
+    {
+        language: 'Yacc',
+        value: 0
+    },
+];
 var languages =[];
 async function getRepos() {
     var api_url = 'https://api.github.com/users/divinembunga/repos';
@@ -21,7 +121,7 @@ async function getRepos() {
 }
 
 async function getFollowersRepos() {
-    var isSame =0;
+   // var isSame =0;
     var username;
     var api_url = 'https://api.github.com/users/divinembunga/followers';
     const response = await fetch(api_url);
@@ -60,9 +160,23 @@ async function getFollowersRepos() {
             }*/
         }
     }
-    console.log(languages);
-    console.log(flang);
+   // console.log(languages);
+    addValues();
 
+
+}
+
+function addValues(){
+    for(var i=0; i<codingLang.length; i++){
+        var count=0;
+        for(var j=0; j<languages.length;j++){
+            if(codingLang[i].language === languages[j]){
+               count++;
+           }
+        }
+        codingLang[i].value =count;
+    }
+    console.log(codingLang);
 }
 
 
@@ -70,15 +184,19 @@ async function getFollowersRepos() {
 
 getRepos();
 class Main extends Component {
+    //getRepos();
     componentDidMount() {
         this.drawChart();
     }
 
     drawChart() {
+        getRepos();
+
+        const sam = codingLang;
         //const data = [12, 5, 6, 6, 9, 10];
         //const dataNames = ["java","phyton","c#","Ruby"];
-        const margin =60;
-        const width =1000 - 2 * margin;
+        const margin =50;
+        const width =2000 - 2 * margin;
         const height = 600 - 2 * margin;
 
         const svg = d3.select("body")
@@ -93,7 +211,104 @@ class Main extends Component {
         const margin = 80;
         const width = 1000 - 2 * margin;
         const height = 600 - 2 * margin;*/
+        const codingLanguage = [
+            {
+                language: 'JavaScript',
+                value: 32
 
+            },
+            {
+                language: 'Java',
+                value: 74
+
+            },
+            {
+                language: 'C',
+                value: 48
+
+            },
+            {
+                language: 'C++',
+                value: 2
+
+            },
+            {
+                language: 'Processing',
+                value: 18
+            },
+            {
+                language: 'TypeScript',
+                value: 4
+            },
+            {
+                language: 'Python',
+                value: 26
+            },
+            {
+                language: 'Lua',
+                value: 2
+            },
+            {
+                language: 'HTML',
+                value: 20
+            },
+            {
+                language: 'CSS',
+                value: 6
+            },
+            {
+                language: 'PHP',
+                value: 2
+            },
+            {
+                language: 'Vue',
+                value: 4
+            },
+            {
+                language: 'Batchfile',
+                value: 2
+            },
+            {
+                language: 'Go',
+                value: 2
+            },
+            {
+                language: 'Assembly',
+                value: 16
+            },
+            {
+                language: 'MATLAB',
+                value: 2
+            },
+            {
+                language: 'TeX',
+                value: 8
+            },
+            {
+                language: 'VDHL',
+                value: 0
+            },
+            {
+                language: 'Prolog',
+                value: 6
+            },
+            {
+                language: 'C#',
+                value: 8
+            },
+            {
+                language: 'Haskell',
+                value: 10
+            },
+            {
+                language: 'Shell',
+                value: 4
+            },
+            {
+                language: 'Yacc',
+                value: 4
+            },
+        ];
         const sample = [
             {
                 language: 'Rust',
@@ -159,12 +374,12 @@ class Main extends Component {
 
         const xScale = d3.scaleBand()
             .range([0, width])
-            .domain(sample.map((s) => s.language))
+            .domain(codingLanguage.map((c) => c.language))
             .padding(0.4)
 
         const yScale = d3.scaleLinear()
             .range([height, 0])
-            .domain([0, 100]);
+            .domain([0, 80]);
 
         // vertical grid lines
         // const makeXLines = () => d3.axisBottom()
@@ -197,7 +412,7 @@ class Main extends Component {
             )
 
         const barGroups = chart.selectAll()
-            .data(sample)
+            .data(codingLanguage)
             .enter()
             .append('g')
 
