@@ -1,6 +1,28 @@
 import React, { Component } from "react";
 import * as d3 from "d3";
 import {drag} from "d3";
+
+var languages =[];
+async function getRepos() {
+    var api_url = 'https://api.github.com/users/divinembunga/repos';
+    const response = await fetch(api_url);
+    const data = await response.json();
+    console.log(data[0].language);
+
+    for(var i=0; i<data.length;i++){
+        if(data[i].language!==null){
+            languages.push(data[i].language);
+            //languages[i]=(data[i].language);
+        }
+    }
+    console.log(languages);
+
+}
+
+
+
+
+getRepos();
 class Main extends Component {
     componentDidMount() {
         this.drawChart();
@@ -30,12 +52,12 @@ class Main extends Component {
             {
                 language: 'Rust',
                 value: 78.9,
-                color: '#000000'
+                //color: '#000000'
             },
             {
                 language: 'Kotlin',
                 value: 75.1,
-                color: '#00a2ee'
+                //color: '#00a2ee'
             },
             {
                 language: 'Python',
