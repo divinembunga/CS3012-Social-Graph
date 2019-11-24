@@ -99,6 +99,7 @@ const codingLang = [
     },
 ];
 
+//array to store the languages
 var languages =[];
 async function getRepos() {
     var api_url = 'https://api.github.com/users/divinembunga/repos';
@@ -160,6 +161,7 @@ async function getFollowersRepos() {
 }
 
 function addValues(){
+    //count the number of repos that use each language
     for(var i=0; i<codingLang.length; i++){
         var count=0;
         for(var j=0; j<languages.length;j++){
@@ -174,7 +176,7 @@ function addValues(){
 
 getRepos();
 
-//save json file to system
+//save final json file to system
 var fs = require('fs');
 
 fs.appendFile('data.json', codingLang, function (err) {

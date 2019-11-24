@@ -1,19 +1,16 @@
 import React, { Component } from "react";
 import * as d3 from "d3";
 import data from  './data.json';
-import {drag} from "d3";
 
 
 class Main extends Component {
-    //getRepos();
+
     componentDidMount() {
         this.drawChart();
     }
 
     drawChart() {
-        
-        //const data = [12, 5, 6, 6, 9, 10];
-        //const dataNames = ["java","phyton","c#","Ruby"];
+        //setup the chart
         const margin =50;
         const width =2000 - 2 * margin;
         const height = 600 - 2 * margin;
@@ -23,90 +20,22 @@ class Main extends Component {
             .attr("width", width)
             .attr("height", height)
             .style("margin-left", margin);
-
-        /*const svg = d3.select('svg');
-        const svgContainer = d3.select('#container');
-
-        const margin = 80;
-        const width = 1000 - 2 * margin;
-        const height = 600 - 2 * margin;*/
+        //getting data from the created file
         const codingLanguage= (data);
-        const  sample = [
-            {
-                language: 'Rust',
-                value: 78.9,
-                //color: '#000000'
-            },
-            {
-                language: 'Kotlin',
-                value: 75.1,
-                //color: '#00a2ee'
-            },
-            {
-                language: 'Python',
-                value: 68.0,
-                color: '#fbcb39'
-            },
-            {
-                language: 'TypeScript',
-                value: 67.0,
-                color: '#007bc8'
-            },
-            {
-                language: 'Go',
-                value: 65.6,
-                color: '#65cedb'
-            },
-            {
-                language: 'Swift',
-                value: 65.1,
-                color: '#ff6e52'
-            },
-            {
-                language: 'JavaScript',
-                value: 61.9,
-                color: '#f9de3f'
-            },
-            {
-                language: 'C#',
-                value: 60.4,
-                color: '#5d2f8e'
-            },
-            {
-                language: 'F#',
-                value: 59.6,
-                color: '#008fc9'
-            },
-            {
-                language: 'Clojure',
-                value: 59.6,
-                color: '#507dca'
-            }
-        ];
 
-        //const svg = d3.select('svg');
-        //const svgContainer = d3.select('#container');
-
-       // const margin = 80;
-       // const width = 1000 - 2 * margin;
-        //const height = 600 - 2 * margin;
-//
         const chart = svg.append('g')
             .attr('transform', `translate(${margin}, ${margin})`);
 
+        //making the x-axis
         const xScale = d3.scaleBand()
             .range([0, width])
             .domain(codingLanguage.map((c) => c.language))
             .padding(0.4)
-
+        //making the y-axis
         const yScale = d3.scaleLinear()
             .range([height, 0])
             .domain([0, 80]);
-
-        // vertical grid lines
-        // const makeXLines = () => d3.axisBottom()
-        //   .scale(xScale)
-
+        //making the horizontal grid lines
         const makeYLines = () => d3.axisLeft()
             .scale(yScale)
 
@@ -117,14 +46,6 @@ class Main extends Component {
         chart.append('g')
             .call(d3.axisLeft(yScale));
 
-        // vertical grid lines
-        // chart.append('g')
-        //   .attr('class', 'grid')
-        //   .attr('transform', `translate(0, ${height})`)
-        //   .call(makeXLines()
-        //     .tickSize(-height, 0, 0)
-        //     .tickFormat('')
-        //   )
 
         chart.append('g')
             .attr('class', 'grid')
@@ -132,7 +53,7 @@ class Main extends Component {
                 .tickSize(-width, 0, 0)
                 .tickFormat('')
             )
-
+        //creating, evaluating and displaying the bars
         const barGroups = chart.selectAll()
             .data(codingLanguage)
             .enter()
@@ -148,7 +69,7 @@ class Main extends Component {
             .on('mouseenter', function (actual, i) {
                 d3.selectAll('.value')
                     .attr('opacity', 0)
-
+                //changing the opacity when hovered over
                 d3.select(this)
                     .transition()
                     .duration(300)
@@ -164,7 +85,7 @@ class Main extends Component {
                     .attr('y1', y)
                     .attr('x2', width)
                     .attr('y2', y)
-
+                //labelling the bars with % difference when hovered over
                 barGroups.append('text')
                     .attr('class', 'divergence')
                     .attr('x', (a) => xScale(a.language) + xScale.bandwidth() / 2)
@@ -182,6 +103,7 @@ class Main extends Component {
                     })
 
             })
+            //returning to original opacity when hovered is released
             .on('mouseleave', function () {
                 d3.selectAll('.value')
                     .attr('opacity', 1)
@@ -196,7 +118,7 @@ class Main extends Component {
                 chart.selectAll('#limit').remove()
                 chart.selectAll('.divergence').remove()
             })
-
+        //displaying the label of the percentage on bars when not hovered
         barGroups
             .append('text')
             .attr('class', 'value')
@@ -204,7 +126,7 @@ class Main extends Component {
             .attr('y', (a) => yScale(a.value) + 30)
             .attr('text-anchor', 'middle')
             .text((a) => `${a.value}%`)
-
+       //labelling axes
         svg
             .append('text')
             .attr('class', 'label')
@@ -228,14 +150,6 @@ class Main extends Component {
             .attr('text-anchor', 'middle')
             .text('Repo Programming Languages')
 
-        /*svg.append('text')
-            .attr('class', 'source')
-            .attr('x', width - margin / 2)
-            .attr('y', height + margin * 1.7)
-            .attr('text-anchor', 'start')
-            .text('Source: Stack Overflow, 2018')*/
-
-
 
     }
 
@@ -243,6 +157,7 @@ class Main extends Component {
 
     render(){
         return <div id={"#" + this.props.id}></div>
+        //display the d3 bar graph
     }
 }
 
