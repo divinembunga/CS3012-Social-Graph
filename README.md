@@ -11,6 +11,8 @@ My original plan was to create a force directed graph using the d3 libaray displ
 
 I dedcided to display the programming languages of the repositories of my own and my followers through an **interactive bar chart**.
 
+![BarChart](Screenshots/Screenshot(140).png)
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
