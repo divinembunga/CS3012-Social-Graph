@@ -1,5 +1,15 @@
-[![Bar Char](https://i.ibb.co/J7LPfYp/https-i-ytimg-com-vi-n4v-MR5sk-Xe-U-maxresdefault.jpg)](https://www.youtube.com/watch?v=n4vMR5skXeU "Bar Char")
+# Software Engineering
+## CS3012: Social Graph
 
+### Task
+Interrogate the GitHub API to build visualisation of data available tht elucidates some aspect of the softare engineering process, such as a social graph of developers and projects, or a visualisation of indiviudal of team performance. Provide a visualisation of this using the d3js library. See https://d3js.org
+
+
+### My Approach
+My original plan was to create a force directed graph using the d3 libaray displaying the connections of followers between my own gihub account and my followers account. I was able to get the required data from the API and store it, however, after following the example of the implementation of a force directed graph on the d3js.orgs webpage, it never displayed. After countless attempts at **commit 8** I decided to change the project and start over even though I spent time and effort on the other approach.
+
+
+I dedcided to display the programming languages of the repositories of my own and my followers through an **interactive bar chart**.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
