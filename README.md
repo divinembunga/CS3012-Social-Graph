@@ -6,12 +6,24 @@ Interrogate the GitHub API to build visualisation of data available tht elucidat
 
 
 ### My Approach
-My original plan was to create a force directed graph using the d3 libaray displaying the connections of followers between my own gihub account and my followers account. I was able to get the required data from the API and store it, however, after following the example of the implementation of a force directed graph on the d3js.orgs webpage, it never displayed. After countless attempts at **commit 8** I decided to change the project and start over even though I spent time and effort on the other approach.
+My original plan was to create a force directed graph using the d3 libaray displaying the connections of followers between my own github account and my followers accounts. I was able to get the required data from the API and store it, however, after following the example of the implementation of a force directed graph on the d3js.orgs webpage, it never displayed. After countless attempts at **commit 8** I decided to change the project and start over even though I spent time and effort on the other approach.
 
 
 I dedcided to display the programming languages of the repositories of my own and my followers through an **interactive bar chart**.
 
-![BarChart](Screenshots/Screenshot(140).png)
+![Bar-Chart](https://github.com/divinembunga/CS3012-Social-Graph/blob/master/Screenshots/Screenshot%20(138).png)
+
+
+When the mouse hovers over a bar, the opacity of the bar changes and every other bar diplays the percentage difference it has from the bar being hovered, **see example below**.
+
+![Example](https://github.com/divinembunga/CS3012-Social-Graph/blob/master/Screenshots/Screenshot%20(141).png)
+
+
+The folder **BackEnd** conatins a Node.js file that communicated with the GitHub API and retrieved the data of the programming languages and the corresponding number of repos and creates a json file, data.json and stores the created json in there.
+
+The code that displayes the bar chart can be found in **src/Main.js**
+
+### Additional Information
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
@@ -58,26 +70,4 @@ You can learn more in the [Create React App documentation](https://facebook.gith
 
 To learn React, check out the [React documentation](https://reactjs.org/).
 
-### Code Splitting
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
